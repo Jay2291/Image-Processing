@@ -21,36 +21,36 @@ async def upload_img(files: list[UploadFile], crop: bool, rotate: bool, zoom: bo
     # cropped = None
     # rotated = None
     # zoomed = None
-    dict1 = {}
+    imagesedit = {}
     for file in files:
         imgname = file.filename.split(".")
         img_path = storage_dir+f'{imgname[0]}\\'
         if not os.path.exists(img_path):
             os.makedirs(img_path)
         save_loc = os.path.join(img_path, file.filename)
-        dict0={f"url":f"{imgname[0]}/{file.filename}"}
+        imageinfo={f"url":f"{imgname[0]}/{file.filename}"}
         with open(save_loc,'wb') as f:
             f.write(file.file.read())
         if crop:
             if crop_left and crop_top and crop_right and crop_bottom:
                 cropped = crop_img(save_loc, (crop_left, crop_top, crop_right, crop_bottom))
-                dict0.update({"cropped_url": f"{imgname[0]}/{os.path.basename(cropped)}"})
+                imageinfo.update({"cropped_url": f"{imgname[0]}/{os.path.basename(cropped)}"})
             else:
                 return JSONResponse({"msg": "Crop values not given"})
         if rotate:
             if rotate_angle:
                 rotated = roto_img(save_loc, rotate_angle)
-                dict0.update({"rotate_url": f"{imgname[0]}/{os.path.basename(rotated)}"})
+                imageinfo.update({"rotate_url": f"{imgname[0]}/{os.path.basename(rotated)}"})
             else:
                 return JSONResponse({"msg": "Rotate angle value not given"})
         if zoom:
             if zoom_percent:
                 zoomed = zoomin_img(save_loc, zoom_percent)
-                dict0.update({"zoom_url": f"{imgname[0]}/{os.path.basename(zoomed)}"})
+                imageinfo.update({"zoom_url": f"{imgname[0]}/{os.path.basename(zoomed)}"})
             else:
                 return JSONResponse({"msg": "Zoom percent value not given"})
-        dict1.update({file.filename: dict0})
-    return JSONResponse({"msg":dict1})
+        imagesedit.update({file.filename: imageinfo})
+    return JSONResponse({"msg":imagesedit})
 
 @app.get('/get_img')
 async def get_img(filename: str):
